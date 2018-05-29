@@ -1,0 +1,44 @@
+<MvFUNCTION NAME = "JSON_Encode" PARAMETERS = "variable" STANDARDOUTPUTLEVEL = "compresswhitespace, html, text">
+	
+	<MvASSIGN NAME = "l.json" VALUE = "{ NULL }" />
+	<MvASSIGN NAME = "l.is_array" VALUE = 0 />
+	<MvASSIGN NAME = "l.is_structure" VALUE = 0 />
+
+	<MvCOMMENT> Check if the passed variable is an array </MvCOMMENT>
+	<MvASSIGN NAME = "l.is_array" VALUE = "{ miva_element_exists(l.variable, 1) }" />
+
+	<MvCOMMENT> Check if the passed variable is a structure </MvCOMMENT>
+	<MvASSIGN NAME = "l.is_structure" VALUE = "{ miva_struct_members(l.variable, l.members) }" />
+
+	<MvCOMMENT> Array Recursion </MvCOMMENT>
+	<MvIF EXPR = "{ l.is_array GT 0 }">
+
+		<MvFOREACH ITERATOR = "l.value" ARRAY = "l.variable" INDEX = "l.index">
+			<MvASSIGN NAME = "l.null" VALUE = "{ miva_array_insert(l.json, JSON_Encode(l.value), -1) }" />
+		</MvFOREACH>
+
+	<MvCOMMENT> Structure Recursion </MvCOMMENT>
+	<MvELSEIF EXPR = "{ l.is_structure GT 0 }">
+
+		<MvFOREACH ITERATOR = "l.member" ARRAY = "l.members" INDEX = "l.index">
+			<MvASSIGN NAME = "l.value" VALUE = "{ miva_variable_value('l.variable:' $ l.member) }" />
+			<MvASSIGN NAME = "l.null" VALUE = "{ miva_array_insert(l.json, '"' $ l.member $ '":' $ JSON_Encode(l.value), -1) }" />
+		</MvFOREACH>
+
+	<MvELSE>
+
+		<MvASSIGN NAME = "l.typed_variable" VALUE = "{ '"' $ encodejavascriptstring(l.variable) $ '"' }" />
+
+		<MvASSIGN NAME = "l.null" VALUE = "{ miva_array_insert_var(l.json, l.typed_variable, -1) }" />
+
+	</MvIF>
+
+	<MvIF EXPR = "{ l.is_array GT 0 }">
+		<MvFUNCTIONRETURN VALUE = "{ '[' $ l.json $ ']' }" />
+	<MvELSEIF EXPR = "{ l.is_structure GT 0 }">
+		<MvFUNCTIONRETURN VALUE = "{ '{' $ l.json $ '}' }" />
+	<MVELSE>
+		<MvFUNCTIONRETURN VALUE = "{ l.json }" />
+	</MvIF>
+	
+</MvFUNCTION>

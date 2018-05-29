@@ -1,0 +1,9 @@
+<MvFUNCTION NAME = "JSON_Encode" PARAMETERS = "variable" STANDARDOUTPUTLEVEL = "compresswhitespace, html, text">
+
+	<MvCAPTURE variable = "l.json">
+		<MvDO FILE = "{ g.Module_JSON }" NAME = "{ l.null }" VALUE = "{ JSON_Output( l.variable ) }"> 
+	</MvCAPTURE>
+	
+	<MvFUNCTIONRETURN VALUE = "{ l.json }" />
+
+</MvFUNCTION>
